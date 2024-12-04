@@ -1,0 +1,127 @@
+﻿@using CMS.Data.Entities
+@using X.PagedList;
+@using X.PagedList.Mvc.Core;
+@model IEnumerable<CMS.Data.Entities.Concert>
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+
+@{
+    ViewData["Title"] = "Concerts";
+}
+
+<h2>Concerts</h2>
+
+@if (User.IsInRole("Admin"))
+{
+    <p>
+        <form>
+            <button class="btn btn-primary" asp-action="Create">Add a Concert</button>
+        </form>
+    </p>
+    <br>
+}
+
+@if (User.Identity.IsAuthenticated)
+{
+       <!-- Search Form if user -->
+<div class="row mb-3">
+    <div class="col-md-8">
+     
+        <form asp-action="Index" method="get">
+            <div class="input-group">
+
+                <input type="text" name="searchTitleString" class="form-control" placeholder="Search by title" value="@ViewBag.SearchTitle" />
+                <input type="text" name="searchPerformerString" class="form-control" placeholder="Search by performer" value="@ViewBag.SearchPerfomer" />
+
+                <button class="btn btn-primary" type="submit">Search</button>
+            </div>
+        </form>
+    </div>
+</div>
+}
+
+<!-- Table of Concerts -->
+<table class="table table-striped table-hover table-bordered">
+    <thead>
+        <tr>
+            <th>
+                @if (ViewBag.SortOrder == "title-desc")
+                {
+                    <a asp-action="Index" asp-route-sortOrder="title-asc">Title</a>
+                }
+                else
+                {
+                    <a asp-action="Index" asp-route-sortOrder="title-desc">Title</a>
+                }
+            </th>
+
+          
+            <th>
+                @Html.DisplayNameFor(model => model.Performer)
+            </th>
+
+            
+            <th>
+                    @Html.DisplayNameFor(model => model.VenueId)
+            </th>
+
+            <th>
+                @if (ViewBag.SortOrder == "date-desc")
+                {
+                    <a asp-action="Index" asp-route-sortOrder="date-asc">Date</a>
+                }
+                else
+                {
+                    <a asp-action="Index" asp-route-sortOrder="date-desc">Date</a>
+                }
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TicketPrice)
+            </th>
+             <th>
+                @Html.DisplayNameFor(model => model.AvailableTickets)
+            </th>
+
+            <th>
+                @Html.DisplayNameFor(model => model.IsSoldOut)
+            </th>
+
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+
+
+                <td>@Html.DisplayFor(modelItem => item.Title)</td>
+                <td>@Html.DisplayFor(modelItem => item.Performer)</td>
+                <td>@Html.DisplayFor(modelItem => item.Venue.Name)</td>
+                <td>@Html.DisplayFor(modelItem => item.Date)</td>
+                <td>@Html.DisplayFor(modelItem => item.TicketPrice)</td>
+                <td>@Html.DisplayFor(modelItem => item.AvailableTickets)</td>
+                <td>@(item.IsSoldOut ? "Yes" : "No")</td>
+               
+                
+                
+                @if (User.IsInRole("Admin"))
+                {
+                <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    
+                </td>
+                }
+            </tr>
+        }
+
+      
+    </tbody>
+</table>
+
+<!-- Pagination -->
+@Html.PagedListPager((IPagedList)Model, page => Url.Action("Index", new { page, searchTitle = ViewBag.TitleSearch, sortOrder = ViewBag.SortOrder }))

@@ -1,0 +1,78 @@
+﻿@model IEnumerable<CMS.Data.Entities.Ticket>
+
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@using Microsoft.AspNetCore.Identity
+@using X.PagedList
+@using X.PagedList.Mvc.Core
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+<div class="text-center">
+    <h1 class="display-4">Welcome to Concert Manager!</h1>
+    <p class="lead">Easily manage concerts, tickets, and venues with our powerful tools.</p>
+</div>
+
+<div class="text-center mt-4">
+    <p>
+        This application offers seamless ticket management and role-based access to ensure a smooth user experience.
+    </p>
+</div>
+
+<h2>What You Can Do</h2>
+<ul>
+    <li><strong>Explore:</strong> View concerts, venues, and ticket details.</li>
+    <li><strong>Manage:</strong> Add, edit, or delete concerts and venues (Admin only).</li>
+    <li><strong>Purchase:</strong> Buy tickets for your favorite events (Registered Users).</li>
+</ul>
+
+@if (SignInManager.IsSignedIn(User))
+{
+    <h3 class="mt-4">Welcome back, <b>@User.Identity.Name</b>!</h3>
+    <p>Use the navigation menu to browse concerts, tickets, and venues.</p>
+}
+else
+{
+    <div class="mt-4">
+        <p>
+            <a href="/Identity/Account/Login" class="btn btn-primary me-2">Log In</a>
+            <a href="/Identity/Account/Register" class="btn btn-secondary">Register</a>
+        </p>
+    </div>
+}
+
+<h3 class="mt-5">Featured Concerts</h3>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table table-bordered table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>Title</th>
+                <th>Venue</th>
+                <th>Date</th>
+                <th>Price</th>
+                <th>Tickets Left</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var ticket in Model)
+            {
+                <tr>
+                    <td>@ticket.Concert.Title</td>
+                    <td>@ticket.Concert.Venue.Name</td>
+                    <td>@ticket.Concert.Date.ToString("dd MMM yyyy")</td>
+                    <td>@ticket.Price.ToString("C2")</td>
+                    <td>@ticket.Concert.AvailableTickets</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No concerts available at the moment. Check back later!</p>
+}
+
+@Html.PagedListPager((IPagedList)Model, page => Url.Action("Index", new { page }))

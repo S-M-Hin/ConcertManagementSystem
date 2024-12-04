@@ -1,0 +1,98 @@
+﻿@using X.PagedList;
+@using X.PagedList.Mvc.Core;
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@model IEnumerable<CMS.Data.Entities.Venue>
+
+@{
+    ViewBag.Title = "Venues";
+}
+
+<h2>Venues</h2>
+
+@if (User.IsInRole("Admin"))
+{
+    <p>
+        <form>
+            <button class="btn btn-primary" asp-action="Create">Add a Venue</button>
+        </form>
+    </p>
+    <br>
+}
+
+@if (User.Identity.IsAuthenticated)
+{
+    <div class="row mb-3">
+        <div class="col-md-8">
+            <form asp-action="Index" method="get">
+                <div class="input-group">
+                    <input type="text" name="searchNameString" class="form-control" placeholder="Search by name" value="@ViewBag.SearchName" />
+                    <input type="text" name="searchLocationString" class="form-control" placeholder="Search by location" value="@ViewBag.SearchLocation" />
+                    <button class="btn btn-primary" type="submit">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}
+
+<!-- Table of Venues -->
+<table class="table table-striped table-hover table-bordered">
+    <thead>
+        <tr>
+            <th>
+                @if (ViewBag.SortOrder == "name-desc")
+                {
+                    <a asp-action="Index" asp-route-sortOrder="name-asc">Name</a>
+                }
+                else
+                {
+                    <a asp-action="Index" asp-route-sortOrder="name-desc">Name</a>
+                }
+            </th>
+
+            <th> @Html.DisplayNameFor(model => model.Location)</th>
+
+            <th>
+                @if (ViewBag.SortOrder == "capacity-desc")
+                {
+                    <a asp-action="Index" asp-route-sortOrder="capacity-asc">Capacity</a>
+                }
+                else
+                {
+                    <a asp-action="Index" asp-route-sortOrder="capacity-desc">Capacity</a>
+                }
+            </th>
+
+            <th> @Html.DisplayNameFor(model => model.ContactPhone)</th>
+            <th> @Html.DisplayNameFor(model => model.Email)</th>
+            <th> @Html.DisplayNameFor(model => model.IsIndoor)</th>
+
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.Name)</td>
+                <td>@Html.DisplayFor(modelItem => item.Location)</td>
+                <td>@Html.DisplayFor(modelItem => item.Capacity)</td>
+                <td>@Html.DisplayFor(modelItem => item.ContactPhone)</td>
+                <td>@Html.DisplayFor(modelItem => item.Email)</td>
+                <td>@(item.IsIndoor ? "Indoor" : "Outdoor")</td>
+
+                @if (User.IsInRole("Admin"))
+                {
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+
+@Html.PagedListPager((IPagedList)Model, page => Url.Action("Index", new { page, searchLocation = ViewBag.SearchLocation, searchName = ViewBag.SearchName, sortOrder = ViewBag.SortOrder }));

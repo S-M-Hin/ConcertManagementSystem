@@ -1,0 +1,83 @@
+﻿@model CMS.Data.Entities.Ticket
+
+@{
+    ViewData["Title"] = "Edit Ticket";
+}
+
+<h1>Edit Ticket</h1>
+
+<h4>Ticket</h4>
+<hr />
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <!-- SeatNumber -->
+            <div class="form-group">
+                <label asp-for="SeatNumber" class="control-label"></label>
+                <input asp-for="SeatNumber" class="form-control" />
+                <span asp-validation-for="SeatNumber" class="text-danger"></span>
+            </div>
+
+            <!-- IsSold -->
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="IsSold" name="IsSold" value="true">
+                <label class="form-check-label" for="IsSold">
+                    Is Sold
+                </label>
+            </div>
+
+            <!-- Price -->
+            <div class="form-group">
+                <label asp-for="Price" class="control-label"></label>
+                <input asp-for="Price" class="form-control" />
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+
+            <!-- PurchaseDate -->
+            <div class="form-group">
+                <label asp-for="PurchaseDate" class="control-label"></label>
+                <input asp-for="PurchaseDate" class="form-control" />
+                <span asp-validation-for="PurchaseDate" class="text-danger"></span>
+            </div>
+
+            <!-- BuyerName -->
+            <div class="form-group">
+                <label asp-for="BuyerName" class="control-label"></label>
+                <input asp-for="BuyerName" class="form-control" />
+                <span asp-validation-for="BuyerName" class="text-danger"></span>
+            </div>
+
+            <!-- BuyerEmail -->
+            <div class="form-group">
+                <label asp-for="BuyerEmail" class="control-label"></label>
+                <input asp-for="BuyerEmail" class="form-control" />
+                <span asp-validation-for="BuyerEmail" class="text-danger"></span>
+            </div>
+
+            <!-- ConcertId (Dropdown for Concerts) -->
+            <div class="form-group">
+                <label asp-for="ConcertId" class="control-label"></label>
+                <select asp-for="ConcertId" class="form-control" asp-items="@(ViewData["Concerts"] as SelectList)">
+                    <option value="">Select Concert</option>
+                </select>
+                <span asp-validation-for="ConcertId" class="text-danger"></span>
+            </div>
+
+            <!-- Submit button -->
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
+}

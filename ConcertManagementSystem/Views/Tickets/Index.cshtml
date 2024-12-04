@@ -1,0 +1,125 @@
+﻿@using X.PagedList;
+@using X.PagedList.Mvc.Core;
+@model IEnumerable<CMS.Data.Entities.Ticket>
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+@{
+    ViewData["Title"] = "Tickets";
+
+    var querySeatNumberParams = new Dictionary<string, string>
+    {
+        { "sortOrder", ViewBag.SeatNumberSortParam },
+        { "searchSeatNumber", ViewBag.SeatNumberSearch },
+    };
+
+    var queryPriceParams = new Dictionary<string, string>
+    {
+        { "sortOrder", ViewBag.PriceSortParam },
+        { "searchPrice", ViewBag.PriceSearch },
+    };
+}
+
+<h1>Tickets</h1>
+
+@if (User.IsInRole("Admin"))
+{
+    <p>
+        <form>
+            <button class="btn btn-primary" asp-action="Create">Add a Ticket</button>
+        </form>
+    </p>
+    <br>
+}
+
+@if (SignInManager.IsSignedIn(User))
+{
+ <div class="row mb-3">
+    <div class="col-md-8">
+   
+         <form asp-action="Index" method="get">
+            <div class="input-group">
+            <input type="text" name="searchSeatNumberString" class="form-control" placeholder="Search by seat number" value="@ViewBag.SearchSeatNumber" />
+            <input type="text" name="searchBuyerString" class="form-control" placeholder="Search by buyer name" value="@ViewBag.SearchBuyer" />
+
+                <button class="btn btn-primary" type="submit">Search</button>
+            </div>
+       </form>
+   </div>
+ </div>
+
+    <div>
+        <a asp-action="Index" class="text-dark">Back to the full list.</a>
+    </div>
+} 
+
+
+
+
+<table class="table table-striped table-hover table-bordered">
+    <thead>
+        <tr>
+            <th>
+                @if (SignInManager.IsSignedIn(User))
+                {
+                    <a asp-action="Index" asp-all-route-data="querySeatNumberParams">Seat Number</a>
+                }
+                else
+                {
+                    @Html.DisplayNameFor(model => model.SeatNumber)
+                }
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsSold)
+            </th>
+            <th>
+                @if (SignInManager.IsSignedIn(User))
+                {
+                    <a asp-action="Index" asp-all-route-data="queryPriceParams">Price</a>
+                }
+                else
+                {
+                    @Html.DisplayNameFor(model => model.Price)
+                }
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PurchaseDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BuyerName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BuyerEmail)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Concert)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.SeatNumber)</td>
+                <td>@Html.DisplayFor(modelItem => item.IsSold)</td>
+                <td>@Html.DisplayFor(modelItem => item.Price)</td>
+                <td>@Html.DisplayFor(modelItem => item.PurchaseDate)</td>
+                <td>@Html.DisplayFor(modelItem => item.BuyerName)</td>
+                <td>@Html.DisplayFor(modelItem => item.BuyerEmail)</td>
+                <td>@Html.DisplayFor(modelItem => item.Concert.Title)</td>
+                @if (User.IsInRole("Admin"))
+                {
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+
+@Html.PagedListPager((IPagedList)Model, page => Url.Action("Index", new { page, searchSeatNumber = ViewBag.SeatNumberSearch, sortOrder = ViewBag.SeatNumberSortParam }))
